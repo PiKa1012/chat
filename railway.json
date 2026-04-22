@@ -1,5 +1,14 @@
 {
-  "build": {
-    "src": "./backend"
+  // 告诉Railpack：你的项目根目录在backend子文件夹，不是最外层
+  "root": "./backend",
+  // 声明语言：Node.js
+  "language": "node",
+  // 构建命令：安装依赖
+  "build": "npm install",
+  // 启动命令：启动你的后端服务server.js
+  "start": "node server.js",
+  // 端口配置（Railway默认端口）
+  "env": {
+    "PORT": "3000"
   }
 }
