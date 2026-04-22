@@ -4,6 +4,6 @@
   "build": "npm install",
   "start": "node server.js",
   "env": {
-    "PORT": "3001"
+    "PORT": "3000"
   }
 }
