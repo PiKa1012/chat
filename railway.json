@@ -1,9 +1,8 @@
 {
   "root": "./backend",
   "language": "node",
-  "build": "npm install",
   "start": "node server.js",
   "env": {
-    "PORT": "3000"
+    "PORT": "3001"
   }
 }
