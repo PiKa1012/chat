@@ -1,4 +1,4 @@
-TURSO_URL=libsql://你的数据库.turso.io
-TURSO_TOKEN=你的token
-JWT_SECRET=你的jwt密钥
-PORT=3001
+node_modules/
+.env
+*.log
+.DS_Store

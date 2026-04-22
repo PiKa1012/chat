@@ -264,9 +264,14 @@ export default function Chat() {
 
   /* ── Init ── */
   useEffect(() => {
-    if (!user) { navigate('/'); return }
-    loadFriends(); loadGroups(); loadPending()
-  }, [])
+  if (!user) { navigate('/'); return }
+  loadFriends(); loadGroups(); loadPending()
+  socket.connect()
+  socket.emit('user_online', user.id)
+  return () => {
+    socket.disconnect()
+  }
+}, [])
 
   useEffect(() => {
     socket.off('receive_private')
