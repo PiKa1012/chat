@@ -1,8 +1,10 @@
 {
   "build": {
-    "buildCommand": "cd backend && npm install"
+    "src": "backend",
+    "buildCommand": "npm install",
+    "pkgs": ["backend/package.json"]
   },
   "deploy": {
-    "startCommand": "cd backend && node server.js"
+    "startCommand": "node server.js"
   }
 }
