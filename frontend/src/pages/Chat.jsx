@@ -702,6 +702,17 @@ function MessageArea({ messages, currentUserId, chatType }) {
     if (listRef.current) listRef.current.scrollTop = listRef.current.scrollHeight
   }, [messages])
   const palette = ['#ff6b6b','#ffa94d','#ffd43b','#69db7c','#4dabf7','#9775fa','#f783ac','#63e6be']
+
+  const formatTime = (timeStr) => {
+    if (!timeStr) return ''
+    const str = timeStr.endsWith('Z') || timeStr.includes('+') ? timeStr : timeStr + 'Z'
+    const d = new Date(str)
+    const now = new Date()
+    const isToday = d.toDateString() === now.toDateString()
+    const hm = d.toLocaleTimeString('zh-CN', { hour: '2-digit', minute: '2-digit', hour12: false })
+    return isToday ? hm : `${d.getMonth()+1}/${d.getDate()} ${hm}`
+  }
+
   return (
     <div ref={listRef} style={{ flex:1, overflowY:'auto', padding:'16px 20px', display:'flex', flexDirection:'column', gap:12 }}>
       {messages.length===0 && <div style={{ textAlign:'center', color:C.textMuted, fontSize:13, marginTop:40 }}>暂无消息，开始聊天吧</div>}
@@ -710,13 +721,16 @@ function MessageArea({ messages, currentUserId, chatType }) {
         const avatarBg = palette[(String(msg.from).charCodeAt(0)||0)%palette.length]
         const showName = chatType==='group' && !isMe
         return (
-          <div key={i} className="msg-bubble" style={{ display:'flex', justifyContent:isMe?'flex-end':'flex-start', gap:8, alignItems:'flex-start' }}>
-            {!isMe && <div style={{ width:28, height:28, borderRadius:'50%', background:avatarBg, display:'flex', alignItems:'center', justifyContent:'center', color:'#fff', fontSize:12, fontWeight:700, flexShrink:0, marginTop:showName?0:4 }}>{String(msg.from).slice(0,1)}</div>}
-            {isMe && <div style={{ width:28, height:28, borderRadius:'50%', background:C.accent, display:'flex', alignItems:'center', justifyContent:'center', color:'#fff', fontSize:12, fontWeight:700, flexShrink:0, marginTop:4 }}>{String(currentUserId).slice(0,1)}</div>}
-            <div style={{ display:'flex', flexDirection:'column', gap:2 }}>
-              {showName && <div style={{ fontSize:12 }}><span style={{ color:avatarBg, fontWeight:600 }}>{msg.username}</span><span style={{ color:C.textMuted }}>({msg.from})</span></div>}
-              <div style={{ maxWidth:400, padding:msg.type==='emoji'?'4px 8px':'8px 12px', borderRadius:isMe?'16px 4px 16px 16px':'4px 16px 16px 16px', background:isMe?C.bubbleSelf:C.bubble, color:C.text, fontSize:14, lineHeight:1.5, boxShadow:'0 1px 3px rgba(0,0,0,0.07)', wordBreak:'break-word' }}>
-                {msg.type==='emoji' ? <span style={{ fontSize:26, lineHeight:1 }}>{msg.content}</span> : msg.content}
+          <div key={i} className="msg-bubble" style={{ display:'flex', flexDirection:'column', alignItems:isMe?'flex-end':'flex-start', gap:2 }}>
+            {msg.time && <div style={{ fontSize:11, color:C.textMuted, paddingInline:36 }}>{formatTime(msg.time)}</div>}
+            <div style={{ display:'flex', justifyContent:isMe?'flex-end':'flex-start', gap:8, alignItems:'flex-start' }}>
+              {!isMe && <div style={{ width:28, height:28, borderRadius:'50%', background:avatarBg, display:'flex', alignItems:'center', justifyContent:'center', color:'#fff', fontSize:12, fontWeight:700, flexShrink:0, marginTop:showName?0:4 }}>{String(msg.from).slice(0,1)}</div>}
+              {isMe && <div style={{ width:28, height:28, borderRadius:'50%', background:C.accent, display:'flex', alignItems:'center', justifyContent:'center', color:'#fff', fontSize:12, fontWeight:700, flexShrink:0, marginTop:4 }}>{String(currentUserId).slice(0,1)}</div>}
+              <div style={{ display:'flex', flexDirection:'column', gap:2 }}>
+                {showName && <div style={{ fontSize:12 }}><span style={{ color:avatarBg, fontWeight:600 }}>{msg.username}</span><span style={{ color:C.textMuted }}>({msg.from})</span></div>}
+                <div style={{ maxWidth:400, padding:msg.type==='emoji'?'4px 8px':'8px 12px', borderRadius:isMe?'16px 4px 16px 16px':'4px 16px 16px 16px', background:isMe?C.bubbleSelf:C.bubble, color:C.text, fontSize:14, lineHeight:1.5, boxShadow:'0 1px 3px rgba(0,0,0,0.07)', wordBreak:'break-word' }}>
+                  {msg.type==='emoji' ? <span style={{ fontSize:26, lineHeight:1 }}>{msg.content}</span> : msg.content}
+                </div>
               </div>
             </div>
           </div>
