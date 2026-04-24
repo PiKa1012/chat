@@ -266,9 +266,15 @@ export default function Chat() {
   useEffect(() => {
   if (!user) { navigate('/'); return }
   loadFriends(); loadGroups(); loadPending()
+  
+  socket.on('connect', () => {
+    socket.emit('user_online', user.id)
+  })
+  
   socket.connect()
-  socket.emit('user_online', user.id)
+  
   return () => {
+    socket.off('connect')
     socket.disconnect()
   }
 }, [])
@@ -277,15 +283,11 @@ export default function Chat() {
     socket.off('receive_private')
     socket.off('receive_group')
     socket.on('receive_private', data => {
-      if (data.from === user.id) return
+      if (String(data.from) === String(user.id)) return
       if (selectedChat?.id == data.from) setMessages(prev => [...prev, data])
       else setUnread(prev => ({ ...prev, [data.from]: (prev[data.from]||0)+1 }))
     })
     socket.on('receive_group', data => {
-      if (sentMsgRef.current[data.time]) {
-        delete sentMsgRef.current[data.time]
-        return
-      }
       if (selectedChat?.id == data.groupId) setMessages(prev => [...prev, data])
     })
   }, [selectedChat])
@@ -394,11 +396,13 @@ export default function Chat() {
 
   const sendMessage = (content, type) => {
     if (!selectedChat || !content) return
-    const time = new Date().toISOString()
-    sentMsgRef.current[time] = true
-    if (selectedChat.type==='private') socket.emit('private_message', { to:selectedChat.id, content, type })
-    else socket.emit('group_message', { groupId:selectedChat.id, content, type, senderId:user.id })
-    setMessages(prev => [...prev, { from:user.id, content, type, time }])
+    if (selectedChat.type === 'private') {
+      const time = new Date().toISOString()
+      setMessages(prev => [...prev, { from: String(user.id), content, type, time }])
+      socket.emit('private_message', { to: selectedChat.id, content, type })
+    } else {
+      socket.emit('group_message', { groupId: selectedChat.id, content, type })
+    }
   }
 
   const handleSend = () => {
